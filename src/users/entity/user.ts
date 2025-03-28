@@ -1,5 +1,15 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Post } from '../../posts/entity/post';
+import { Comment } from '../../comments/entity/comment';  // Make sure to import Comment
 
 @Entity('users')
 export class User {
@@ -30,9 +40,12 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
+  @OneToMany(() => Comment, (comment) => comment.user)  // Corrected this line
+  comments: Comment[];
 
-  //Hash password before inserting into database
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     this.password = await bcrypt.hash(this.password, 10);
