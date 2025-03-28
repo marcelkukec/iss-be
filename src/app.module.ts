@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from './posts/posts.module';
 import { Post } from './posts/entity/post';
 import { ConfigModule } from '@nestjs/config';
+import { CommentsModule } from './comments/comments.module';
+import { Comment } from './comments/entity/comment';
 
 @Module({
   imports: [
@@ -17,11 +19,12 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Post],
+      entities: [Post, Comment],
       synchronize: true,
 
     }),
-    PostsModule
+    PostsModule,
+    CommentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

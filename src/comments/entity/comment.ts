@@ -2,18 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Comment } from '../../comments/entity/comment';
+import { Post } from '../../posts/entity/post';
 
-@Entity('posts')
-export class Post {
+@Entity('comments')
+export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
-  title: string;
   @Column()
   body: string;
   @CreateDateColumn()
@@ -21,6 +20,7 @@ export class Post {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments: Comment[];
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
 }
