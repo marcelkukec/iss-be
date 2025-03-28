@@ -5,5 +5,5 @@ export class UpdateCommentDto {
   @IsString()
   comment?: string;
 
-  post_id?: number;
+  post_id: number;
 }

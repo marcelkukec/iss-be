@@ -12,19 +12,23 @@ export class CommentsService {
     private commentRepository: Repository<Comment>,
   ) {}
 
+  //Create comment
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
     const newComment = this.commentRepository.create({...createCommentDto});
     return this.commentRepository.save(newComment);
   }
 
+  //Get all comments
   async findAll(): Promise<Comment[]> {
     return this.commentRepository.find();
   }
 
+  //Find all comments from a post
   async findAllFromPost(postId: number): Promise<Comment[]> {
     return this.commentRepository.find({where: {post_id: postId}});
   }
 
+  //Update post by id
   async update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
     const comment = await this.commentRepository.findOne({where: {id: id}});
     if (!comment) {
@@ -41,6 +45,7 @@ export class CommentsService {
     return updatedComment;
   }
 
+  //Delete comment by id
   async delete(id: number): Promise<void> {
     await this.commentRepository.delete(id);
   }
