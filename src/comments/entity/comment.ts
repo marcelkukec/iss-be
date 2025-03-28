@@ -13,14 +13,21 @@ import { Post } from '../../posts/entity/post';
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
-  body: string;
+  comment: string;
+
+  @Column()
+  post_id: number;
+
   @CreateDateColumn()
   created_at: Date;
+
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => Post, (post) => post.comments)
+
+  @ManyToOne(() => Post, (post) => post.comments, {nullable: false})
   @JoinColumn({ name: 'post_id' })
   post: Post;
 }
