@@ -5,6 +5,7 @@ import { CreatePostDto } from './entity/create-post.dto';
 import { UpdatePostDto } from './entity/update-post.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RequestWithUser } from '../auth/request-with-user-interface';
+import { Public } from '../auth/public.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('posts')
@@ -23,16 +24,19 @@ export class PostsController {
     return this.postService.create(createPostDto, user_id, group_id);
   }
 
+  @Public()
   @Get()
   async findAll(): Promise<Post[]> {
     return this.postService.findAll();
   }
 
+  @Public()
   @Get('user/:user_id')
   async findAllFromUser(@Param('user_id') user_id: number): Promise<Post[]> {
     return this.postService.findAllFromUser(user_id);
   }
 
+  @Public()
   @Get('group/:group_id')
   async findAllInGroup(@Param('group_id') group_id: number): Promise<Post[]> {
     return this.postService.findAllInGroup(group_id);
