@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Comment } from '../../comments/entity/comment';
 import { User } from '../../users/entity/user';
+import { Group } from '../../groups/entity/group';
 
 @Entity('posts')
 export class Post {
@@ -32,7 +33,11 @@ export class Post {
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.posts, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => Group, (group) => group.posts, { nullable: false })
+  @JoinColumn({ name: 'group_id' })
+  group: Group;
 }

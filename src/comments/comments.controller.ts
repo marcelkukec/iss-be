@@ -28,7 +28,7 @@ export class CommentsController {
     return this.commentsService.findAllByUser(user_id);
   }
 
-  @Patch(':post_id')
+  @Patch(':id')
   async update(
     @Param('id') id: number,
     @Body() updateCommentDto: UpdateCommentDto,

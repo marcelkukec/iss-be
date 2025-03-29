@@ -30,11 +30,11 @@ export class Comment {
   @Column()
   user_id: number;
 
-  @ManyToOne(() => Post, (post) => post.comments, {nullable: false})
+  @ManyToOne(() => Post, (post) => post.comments, { nullable: false })
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.comments, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

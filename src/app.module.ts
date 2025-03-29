@@ -11,6 +11,9 @@ import { Comment } from './comments/entity/comment';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entity/user';
 import { AuthModule } from './auth/auth.module';
+import { GroupsModule } from './groups/groups.module';
+import { Group } from './groups/entity/group';
+import { UserGroup } from './groups/entity/user-group';
 
 
 @Module({
@@ -23,13 +26,14 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Post, Comment, User],
+      entities: [Post, Comment, User, Group, UserGroup],
       synchronize: true,
     }),
     PostsModule,
     CommentsModule,
     UsersModule,
     AuthModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

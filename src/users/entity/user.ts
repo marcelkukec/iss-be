@@ -10,6 +10,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../posts/entity/post';
 import { Comment } from '../../comments/entity/comment';
+import { UserGroup } from '../../groups/entity/user-group';
 
 @Entity('users')
 export class User {
@@ -45,6 +46,9 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @OneToMany(() => UserGroup, (userGroup) => userGroup.user)
+  userGroups: UserGroup[];
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
