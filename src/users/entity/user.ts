@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../posts/entity/post';
-import { Comment } from '../../comments/entity/comment';  // Make sure to import Comment
+import { Comment } from '../../comments/entity/comment';
 
 @Entity('users')
 export class User {
@@ -22,16 +22,16 @@ export class User {
   @Column()
   last_name: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   username: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   email: string;
 
   @Column()
   password: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   avatar?: string;
 
   @CreateDateColumn()
@@ -43,7 +43,7 @@ export class User {
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
-  @OneToMany(() => Comment, (comment) => comment.user)  // Corrected this line
+  @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
   @BeforeInsert()

@@ -6,7 +6,9 @@ import { UserRegisterDto } from '../auth/user-register.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private readonly  userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly  userRepository: Repository<User>,
+  ) {}
 
   create(user: UserRegisterDto): Promise<User> {
     const newUser = this.userRepository.create({...user})
@@ -15,5 +17,9 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({where: {email}})
+  }
+
+  async findById(id: number): Promise<User | null> {
+    return await this.userRepository.findOne({where: {id}})
   }
 }

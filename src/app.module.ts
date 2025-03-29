@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entity/user';
 import { AuthModule } from './auth/auth.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
@@ -24,12 +25,11 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.DATABASE_NAME,
       entities: [Post, Comment, User],
       synchronize: true,
-
     }),
     PostsModule,
     CommentsModule,
     UsersModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

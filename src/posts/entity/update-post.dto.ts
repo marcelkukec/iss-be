@@ -8,4 +8,6 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   body?: string;
+
+  user_id: number;
 }

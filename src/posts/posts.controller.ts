@@ -9,25 +9,26 @@ export class PostsController {
   constructor(private readonly postService: PostsService) {
   }
 
-  //Create a new post
   @HttpPost()
   async create(@Body() createPostDto: CreatePostDto): Promise<Post> {
     return this.postService.create(createPostDto);
   }
 
-  //Get all posts
   @Get()
   async findAll(): Promise<Post[]> {
     return this.postService.findAll();
   }
 
-  //Update post by id
+  @Get('user/:user_id')
+  async findAllFromUser(@Param('user_id') user_id: number): Promise<Post[]> {
+    return this.postService.findAllFromUser(user_id);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto): Promise<Post> {
     return await this.postService.update(+id, updatePostDto);
   }
 
-  //Delete post by id
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     await this.postService.delete(+id);

@@ -12,18 +12,19 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  //Create a new post
   async create(createPostDto: CreatePostDto): Promise<Post> {
     const newPost = this.postRepository.create({...createPostDto});
     return this.postRepository.save(newPost);
   }
 
-  //Get all posts
   async findAll(): Promise<Post[]> {
     return this.postRepository.find();
   }
 
-  //Update post by id
+  async findAllFromUser(user_id: number): Promise<Post[]> {
+    return  this.postRepository.find({ where: { user: { id: user_id, } } })
+  }
+
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
     const post = this.postRepository.findOne({where: {id: id}});
     if (!post) {
@@ -39,7 +40,6 @@ export class PostsService {
     return updatedPost;
   }
 
-  //Delete post by id
   async delete(id: number): Promise<void> {
     await this.postRepository.delete(id);
   }
