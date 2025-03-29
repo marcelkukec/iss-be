@@ -46,6 +46,10 @@ export class PostsService {
     return  this.postRepository.find({ where: { user: { id: user_id, } } })
   }
 
+  async findAllInGroup(group_id: number): Promise<Post[]> {
+    return this.postRepository.find({ where: { group: { id: group_id}, }, relations: ['user', 'group'], });
+  }
+
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
     const post = this.postRepository.findOne({where: {id: id}});
     if (!post) {

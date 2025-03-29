@@ -12,7 +12,7 @@ export class GroupsService {
   ) {}
 
   async create(createGroupDto: CreateGroupDto): Promise<Group> {
-    const group = await this.groupsRepository.create({ ...createGroupDto });
+    const group = this.groupsRepository.create({ ...createGroupDto });
     return this.groupsRepository.save(group);
   }
 

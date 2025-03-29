@@ -33,6 +33,11 @@ export class PostsController {
     return this.postService.findAllFromUser(user_id);
   }
 
+  @Get('group/:group_id')
+  async findAllInGroup(@Param('group_id') group_id: number): Promise<Post[]> {
+    return this.postService.findAllInGroup(group_id);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto): Promise<Post> {
     return await this.postService.update(+id, updatePostDto);
