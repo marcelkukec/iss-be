@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {  Injectable, NotFoundException } from '@nestjs/common';
 import { UserGroup } from './entity/user-group';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,10 +34,19 @@ export class UserGroupsService {
 
     const isMember = await this.isUserInGroup(user_id, group_id);
     if (isMember) {
-      throw new ForbiddenException(`User: ${user_id} is already in this group: ${group_id}`);
+      throw new NotFoundException(`User: ${user_id} is already in this group: ${group_id}`);
     }
 
     const userGroup = this.userGroupRepository.create({ user, group });
     return this.userGroupRepository.save(userGroup);
+  }
+
+  async removeUserFromGroup(user_id: number, group_id: number): Promise<void> {
+    const isMember = await this.isUserInGroup(user_id, group_id);
+    if (!isMember) {
+      throw new NotFoundException(`User: ${user_id} is not a member in this group: ${group_id}`);
+    }
+
+    await this.userGroupRepository.delete({ user: { id: user_id}, group: { id: group_id}, });
   }
 }
