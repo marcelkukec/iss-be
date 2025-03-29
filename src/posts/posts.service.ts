@@ -50,22 +50,42 @@ export class PostsService {
     return this.postRepository.find({ where: { group: { id: group_id}, }, relations: ['user', 'group'], });
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
-    const post = this.postRepository.findOne({where: {id: id}});
+  async update(id: number, updatePostDto: UpdatePostDto, user_id: number): Promise<Post> {
+    const post = await this.postRepository.findOne({where: {id: id}, relations: ['user'], });
+
     if (!post) {
       throw new NotFoundException(`Post doesn't exist`);
     }
-    await this.postRepository.update(id, updatePostDto);
 
-    const updatedPost = await this.postRepository.findOne({where: {id: id}});
-    if(!updatedPost) {
-      throw new NotFoundException(`Post doesn't exist after update`);
+    if (post.user.id !== user_id) {
+      throw new ForbiddenException('You can only update your own posts');
     }
 
-    return updatedPost;
+    if('group_id' in updatePostDto) {
+      const group = await this.groupRepository.findOne({ where: { id: updatePostDto.group_id } });
+      if (!group) {
+        throw new ForbiddenException(`Group with id ${updatePostDto.group_id} does not exist`);
+      }
+      post.group = group;
+    }
+
+    const { group_id, ...rest } = updatePostDto
+
+    Object.assign(post, rest);
+    return this.postRepository.save(post);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.postRepository.delete(id);
+  async delete(id: number, user_id: number): Promise<void> {
+    const post = await this.postRepository.findOne({where: {id: id}, relations: ['user'], });
+
+    if (!post) {
+      throw new NotFoundException(`Post doesn't exist`);
+    }
+
+    if (post.user.id !== user_id) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
+    await this.postRepository.remove(post);
   }
 }

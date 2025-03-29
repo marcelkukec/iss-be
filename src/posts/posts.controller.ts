@@ -43,12 +43,19 @@ export class PostsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto): Promise<Post> {
-    return await this.postService.update(+id, updatePostDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @Req() req: RequestWithUser,
+   ): Promise<Post> {
+    return await this.postService.update(+id, updatePostDto, req.user.user_id);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
-    await this.postService.delete(+id);
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ): Promise<void> {
+    await this.postService.delete(+id, req.user.user_id);
   }
 }

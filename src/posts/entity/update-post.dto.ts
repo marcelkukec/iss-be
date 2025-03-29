@@ -13,6 +13,7 @@ export class UpdatePostDto {
   @IsNumber()
   user_id?: number;
 
+  @IsOptional()
   @IsNumber()
-  group_id: number;
+  group_id?: number;
 }
