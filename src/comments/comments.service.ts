@@ -1,20 +1,36 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Comment } from './entity/comment';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './entity/create-comment.dto';
 import { UpdateCommentDto } from './entity/update-comment.dto';
+import { Post } from '../posts/entity/post';
+import { User } from '../users/entity/user';
 
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>,
+    @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto): Promise<Comment> {
-    const newComment = this.commentRepository.create({...createCommentDto});
-    return this.commentRepository.save(newComment);
+  async create(createCommentDto: CreateCommentDto, user_id: number): Promise<Comment> {
+    const post = await this.postRepository.findOne({ where: { id: createCommentDto.post_id } });
+    if (!post) {
+      throw new NotFoundException(`Post with id ${createCommentDto.post_id} not found`);
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: user_id } });
+    if (!user) {
+      throw new NotFoundException(`User with id ${user_id} not found`);
+    }
+
+    const comment = this.commentRepository.create({ ...createCommentDto, user, post});
+
+    return this.commentRepository.save(comment);
   }
 
   async findAll(): Promise<Comment[]> {
@@ -29,23 +45,32 @@ export class CommentsService {
     return this.commentRepository.find({where: {user_id: user_id}});
   }
 
-  async update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
-    const comment = await this.commentRepository.findOne({where: {id: id}});
+  async update(id: number, updateCommentDto: UpdateCommentDto, user_id: number): Promise<Comment> {
+    const comment = await this.commentRepository.findOne({ where: { id }, relations: ['user'], });
+
     if (!comment) {
       throw new NotFoundException(`Comment doesn't exist`);
     }
 
-    await this.commentRepository.update(id, updateCommentDto);
-
-    const updatedComment = await this.commentRepository.findOne({where: {id: id}});
-    if (!updatedComment) {
-      throw new NotFoundException(`Comment doesn't exist after update`);
+    if (comment.user.id !== user_id) {
+      throw new ForbiddenException('You can only update your own comments');
     }
 
-    return updatedComment;
+    Object.assign(comment, updateCommentDto);
+    return this.commentRepository.save(comment);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.commentRepository.delete(id);
+  async delete(id: number, user_id: number): Promise<void> {
+    const comment = await this.commentRepository.findOne({ where: { id }, relations: ['user'], });
+
+    if (!comment) {
+      throw new NotFoundException(`Comment doesn't exist`);
+    }
+
+    if (comment.user.id !== user_id) {
+      throw new ForbiddenException('You can only delete your own comments');
+    }
+
+    await this.commentRepository.remove(comment);
   }
 }

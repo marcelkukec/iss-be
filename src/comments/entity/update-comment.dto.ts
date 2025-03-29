@@ -3,11 +3,13 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 export class UpdateCommentDto {
   @IsOptional()
   @IsString()
-  comment?: string;
+  content?: string;
 
-  @IsNumber()
-  post_id: number;
-
+  @IsOptional()
   @IsNumber()
   user_id?: number;
+
+  @IsOptional()
+  @IsNumber()
+  post_id?: number;
 }

@@ -1,16 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import {Comment} from './entity/comment';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './entity/create-comment.dto';
 import { UpdateCommentDto } from './entity/update-comment.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RequestWithUser } from '../auth/request-with-user-interface';
 
+@UseGuards(JwtAuthGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  async create(@Body() createCommentDto: CreateCommentDto): Promise<Comment> {
-    return this.commentsService.create(createCommentDto);
+  async create(
+    @Body() createCommentDto: CreateCommentDto,
+    @Req() req: RequestWithUser,
+  ): Promise<Comment> {
+    return this.commentsService.create(createCommentDto, req.user.user_id);
   }
 
   @Get()
@@ -32,12 +38,16 @@ export class CommentsController {
   async update(
     @Param('id') id: number,
     @Body() updateCommentDto: UpdateCommentDto,
+    @Req() req: RequestWithUser,
   ): Promise<Comment> {
-    return this.commentsService.update(+id, updateCommentDto);
+    return this.commentsService.update(+id, updateCommentDto, req.user.user_id);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number): Promise<void> {
-    await this.commentsService.delete(+id);
+  async delete(
+    @Param('id') id: number,
+    @Req() req: RequestWithUser,
+  ): Promise<void> {
+    await this.commentsService.delete(+id, req.user.user_id);
   }
 }
