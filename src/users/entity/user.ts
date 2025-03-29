@@ -10,7 +10,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../posts/entity/post';
 import { Comment } from '../../comments/entity/comment';
-import { UserGroup } from '../../groups/entity/user-group';
+import { UserGroup } from '../../user-groups/entity/user-group';
 
 @Entity('users')
 export class User {

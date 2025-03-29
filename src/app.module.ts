@@ -13,7 +13,8 @@ import { User } from './users/entity/user';
 import { AuthModule } from './auth/auth.module';
 import { GroupsModule } from './groups/groups.module';
 import { Group } from './groups/entity/group';
-import { UserGroup } from './groups/entity/user-group';
+import { UserGroup } from './user-groups/entity/user-group';
+import { UserGroupsController } from './user-groups/user-groups.controller';
 
 
 @Module({
@@ -35,7 +36,7 @@ import { UserGroup } from './groups/entity/user-group';
     AuthModule,
     GroupsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserGroupsController],
   providers: [AppService],
 })
 export class AppModule {}

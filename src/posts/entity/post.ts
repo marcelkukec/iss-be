@@ -27,8 +27,6 @@ export class Post {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column()
-  user_id: number;
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
