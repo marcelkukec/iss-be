@@ -11,6 +11,10 @@ export class UserRegisterDto {
 
   @IsNotEmpty()
   @IsString()
+  username: string;
+
+  @IsNotEmpty()
+  @IsString()
   first_name: string;
 
   @IsNotEmpty()
