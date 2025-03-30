@@ -27,7 +27,7 @@ export class Comment {
   @Column()
   post_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   user_id: number;
 
   @ManyToOne(() => Post, (post) => post.comments, { nullable: false })

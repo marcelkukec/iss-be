@@ -4,6 +4,7 @@ import { Group } from './entity/group';
 import { Repository } from 'typeorm';
 import { CreateGroupDto } from './entity/create-group.dto';
 import { UpdateGroupDto } from './entity/update-group.dto';
+import { User } from '../users/entity/user';
 
 @Injectable()
 export class GroupsService {
@@ -18,6 +19,16 @@ export class GroupsService {
 
   async findAll(): Promise<Group[]> {
     return this.groupsRepository.find();
+  }
+
+  async allMembers(group_id: number): Promise<User[]> {
+    const group = await this.groupsRepository.findOne({ where: { id: group_id }, relations: ['userGroups', 'userGroups.user'], });
+
+    if (!group) {
+      throw new NotFoundException(`Group ${group_id} not found`);
+    }
+
+    return group.userGroups.map((ug) => ug.user);
   }
 
   async update(id: number, updateGroupDto: UpdateGroupDto): Promise<Group> {

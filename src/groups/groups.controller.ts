@@ -3,6 +3,7 @@ import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './entity/create-group.dto';
 import { Group } from './entity/group';
 import { UpdateGroupDto } from './entity/update-group.dto';
+import { User } from '../users/entity/user';
 
 @Controller('groups')
 export class GroupsController {
@@ -16,6 +17,11 @@ export class GroupsController {
   @Get()
   async findAll(): Promise<Group[]> {
     return this.groupsService.findAll();
+  }
+
+  @Get(':id/members')
+  async allMembers(@Param('id') id: number): Promise<User[]> {
+    return this.groupsService.allMembers(id);
   }
 
   @Patch(':id')
