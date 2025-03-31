@@ -18,7 +18,7 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto & { group_id: number},
     @Req() req: RequestWithUser
   ): Promise<Post> {
-    const user_id = (req.user as any).user_id;
+    const user_id = (req.user as any).id;
     const group_id = createPostDto.group_id;
 
     return this.postService.create(createPostDto, user_id, group_id);
