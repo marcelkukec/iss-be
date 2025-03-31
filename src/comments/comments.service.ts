@@ -38,7 +38,7 @@ export class CommentsService {
   }
 
   async findAllFromPost(post_id: number): Promise<Comment[]> {
-    return this.commentRepository.find({where: {post_id: post_id}});
+    return this.commentRepository.find({where: {post_id: post_id}, relations: ['user']});
   }
 
   findAllByUser(user_id: number): Promise<Comment[]> {
@@ -46,7 +46,7 @@ export class CommentsService {
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto, user_id: number): Promise<Comment> {
-    const comment = await this.commentRepository.findOne({ where: { id }, relations: ['user'], });
+    const comment = await this.commentRepository.findOne({ where: { id } });
 
     if (!comment) {
       throw new NotFoundException(`Comment doesn't exist`);

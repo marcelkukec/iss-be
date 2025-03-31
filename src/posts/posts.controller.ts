@@ -31,6 +31,12 @@ export class PostsController {
   }
 
   @Public()
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Post> {
+    return this.postService.findOne(id);
+  }
+
+  @Public()
   @Get('user/:user_id')
   async findAllFromUser(@Param('user_id') user_id: number): Promise<Post[]> {
     return this.postService.findAllFromUser(user_id);

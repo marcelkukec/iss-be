@@ -39,7 +39,17 @@ export class PostsService {
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postRepository.find();
+    return this.postRepository.find({ relations: ['user', 'group'] });
+  }
+
+  async findOne(id: number): Promise<Post> {
+    const post = await this.postRepository.findOne({ where: { id: id }, relations: ['user', 'group'] });
+
+    if(!post) {
+      throw new NotFoundException(`Post with id ${id} doesn't exist`);
+    }
+
+    return post;
   }
 
   async findAllFromUser(user_id: number): Promise<Post[]> {
