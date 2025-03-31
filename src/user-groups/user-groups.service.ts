@@ -46,7 +46,6 @@ export class UserGroupsService {
     if (!isMember) {
       throw new NotFoundException(`User: ${user_id} is not a member in this group: ${group_id}`);
     }
-
-    await this.userGroupRepository.delete({ user: { id: user_id}, group: { id: group_id}, });
+    await this.userGroupRepository.createQueryBuilder().delete().where('user_id = :user_id', { user_id }).andWhere('group_id = :group_id', { group_id }).execute();
   }
 }
