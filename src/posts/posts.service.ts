@@ -1,12 +1,13 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entity/post';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreatePostDto } from './entity/create-post.dto';
 import { UpdatePostDto } from './entity/update-post.dto';
 import { Group } from '../groups/entity/group';
 import { User } from '../users/entity/user';
 import { UserGroupsService } from '../user-groups/user-groups.service';
+import { UserGroup } from '../user-groups/entity/user-group';
 
 @Injectable()
 export class PostsService {
@@ -16,6 +17,8 @@ export class PostsService {
     @InjectRepository(Group) private readonly groupRepository: Repository<Group>,
 
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+
+    @InjectRepository(UserGroup) private readonly userGroupRepository: Repository<UserGroup>,
 
     private readonly userGroupService: UserGroupsService,
   ) {}
@@ -39,7 +42,7 @@ export class PostsService {
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postRepository.find({ relations: ['user', 'group'] });
+    return this.postRepository.find({ order: { created_at: 'DESC'},  relations: ['user', 'group'] });
   }
 
   async findOne(id: number): Promise<Post> {
@@ -53,11 +56,21 @@ export class PostsService {
   }
 
   async findAllFromUser(user_id: number): Promise<Post[]> {
-    return  this.postRepository.find({ where: { user: { id: user_id, } } })
+    return  this.postRepository.find({ where: { user: { id: user_id, } }, order: {created_at: 'DESC'}, relations: ['group'] })
   }
 
   async findAllInGroup(group_id: number): Promise<Post[]> {
-    return this.postRepository.find({ where: { group: { id: group_id}, }, relations: ['user', 'group'], });
+    return this.postRepository.find({ where: { group: { id: group_id}, }, order: {created_at: 'DESC'}, relations: ['user', 'group'], });
+  }
+
+  async findPostsByUserGroups(user_id: number): Promise<Post[]> {
+    const userGroups = await this.userGroupRepository.find({ where: { user: { id: user_id } }, relations: ['group'], });
+
+    const group_ids = userGroups.map(ug => ug.group.id);
+
+    if (!group_ids.length) return [];
+
+    return this.postRepository.find({ where: { group: { id: In(group_ids) } }, order: { created_at: 'DESC' }, relations: ['user', 'group'], });
   }
 
   async update(id: number, updatePostDto: UpdatePostDto, user_id: number): Promise<Post> {

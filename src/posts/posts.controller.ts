@@ -48,6 +48,11 @@ export class PostsController {
     return this.postService.findAllInGroup(group_id);
   }
 
+  @Get('my-feed')
+  async getMyFeed(@Req() req: RequestWithUser) {
+    return this.postService.findPostsByUserGroups(req.user.id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id') id: string,
