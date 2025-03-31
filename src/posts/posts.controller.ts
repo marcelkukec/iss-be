@@ -36,12 +36,6 @@ export class PostsController {
   }
 
   @Public()
-  @Get(':id')
-  async findOne(@Param('id') id: number): Promise<Post> {
-    return this.postService.findOne(id);
-  }
-
-  @Public()
   @Get('user/:user_id')
   async findAllFromUser(@Param('user_id') user_id: number): Promise<Post[]> {
     return this.postService.findAllFromUser(user_id);
@@ -52,6 +46,13 @@ export class PostsController {
   async findAllInGroup(@Param('group_id') group_id: number): Promise<Post[]> {
     return this.postService.findAllInGroup(group_id);
   }
+
+  @Public()
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Post> {
+    return this.postService.findOne(id);
+  }
+
 
   @Patch(':id')
   async update(

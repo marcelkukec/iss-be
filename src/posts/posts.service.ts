@@ -56,7 +56,7 @@ export class PostsService {
   }
 
   async findAllFromUser(user_id: number): Promise<Post[]> {
-    return  this.postRepository.find({ where: { user: { id: user_id, } }, order: {created_at: 'DESC'}, relations: ['group'] })
+    return  this.postRepository.find({ where: { user: { id: user_id, } }, order: {created_at: 'DESC'}, relations: ['user', 'group'] })
   }
 
   async findAllInGroup(group_id: number): Promise<Post[]> {
