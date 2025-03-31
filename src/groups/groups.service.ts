@@ -21,6 +21,16 @@ export class GroupsService {
     return this.groupsRepository.find();
   }
 
+  async findOne(id: number): Promise<Group> {
+    const group = await this.groupsRepository.findOne({ where: { id } });
+
+    if (!group) {
+      throw new NotFoundException(`Group with id ${id} doesn't exist`);
+    }
+
+    return group;
+  }
+
   async allMembers(group_id: number): Promise<User[]> {
     const group = await this.groupsRepository.findOne({ where: { id: group_id }, relations: ['userGroups', 'userGroups.user'], });
 

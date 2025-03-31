@@ -19,6 +19,11 @@ export class GroupsController {
     return this.groupsService.findAll();
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Group> {
+    return this.groupsService.findOne(id);
+  }
+
   @Get(':id/members')
   async allMembers(@Param('id') id: number): Promise<User[]> {
     return this.groupsService.allMembers(id);
