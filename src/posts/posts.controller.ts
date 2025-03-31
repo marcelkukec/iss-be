@@ -30,6 +30,11 @@ export class PostsController {
     return this.postService.findAll();
   }
 
+  @Get('my-feed')
+  async getMyFeed(@Req() req: RequestWithUser) {
+    return this.postService.findPostsByUserGroups(req.user.id);
+  }
+
   @Public()
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Post> {
@@ -46,11 +51,6 @@ export class PostsController {
   @Get('group/:group_id')
   async findAllInGroup(@Param('group_id') group_id: number): Promise<Post[]> {
     return this.postService.findAllInGroup(group_id);
-  }
-
-  @Get('my-feed')
-  async getMyFeed(@Req() req: RequestWithUser) {
-    return this.postService.findPostsByUserGroups(req.user.id);
   }
 
   @Patch(':id')
