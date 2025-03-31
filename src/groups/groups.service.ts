@@ -31,6 +31,14 @@ export class GroupsService {
     return group;
   }
 
+  async getGroupsByUserId(user_id: number) {
+    return this.groupsRepository
+      .createQueryBuilder('group')
+      .innerJoin('group.userGroups', 'userGroup')
+      .where('userGroup.user_id = :user_id', { user_id })
+      .getMany();
+  }
+
   async allMembers(group_id: number): Promise<User[]> {
     const group = await this.groupsRepository.findOne({ where: { id: group_id }, relations: ['userGroups', 'userGroups.user'], });
 
