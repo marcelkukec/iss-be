@@ -11,18 +11,18 @@ export class UsersController {
 
   @Get('me')
   findProfile(@Req() req: RequestWithUser){
-    return this.usersService.findById(req.user.user_id)
+    return this.usersService.findById(req.user.id)
   }
 
   @Patch('me')
   update(
     @Req() req: RequestWithUser,
     @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user.user_id, updateUserDto);
+    return this.usersService.update(req.user.id, updateUserDto);
   }
 
   @Delete('me')
   delete(@Req() req: RequestWithUser){
-    return this.usersService.delete(req.user.user_id);
+    return this.usersService.delete(req.user.id);
   }
 }

@@ -17,7 +17,7 @@ export class CommentsController {
     @Body() createCommentDto: CreateCommentDto,
     @Req() req: RequestWithUser,
   ): Promise<Comment> {
-    return this.commentsService.create(createCommentDto, req.user.user_id);
+    return this.commentsService.create(createCommentDto, req.user.id);
   }
 
   @Public()
@@ -44,7 +44,7 @@ export class CommentsController {
     @Body() updateCommentDto: UpdateCommentDto,
     @Req() req: RequestWithUser,
   ): Promise<Comment> {
-    return this.commentsService.update(+id, updateCommentDto, req.user.user_id);
+    return this.commentsService.update(+id, updateCommentDto, req.user.id);
   }
 
   @Delete(':id')
@@ -52,6 +52,6 @@ export class CommentsController {
     @Param('id') id: number,
     @Req() req: RequestWithUser,
   ): Promise<void> {
-    await this.commentsService.delete(+id, req.user.user_id);
+    await this.commentsService.delete(+id, req.user.id);
   }
 }

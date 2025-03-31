@@ -54,7 +54,7 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
     @Req() req: RequestWithUser,
    ): Promise<Post> {
-    return await this.postService.update(+id, updatePostDto, req.user.user_id);
+    return await this.postService.update(+id, updatePostDto, req.user.id);
   }
 
   @Delete(':id')
@@ -62,6 +62,6 @@ export class PostsController {
     @Param('id') id: string,
     @Req() req: RequestWithUser,
   ): Promise<void> {
-    await this.postService.delete(+id, req.user.user_id);
+    await this.postService.delete(+id, req.user.id);
   }
 }
