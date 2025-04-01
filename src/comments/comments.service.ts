@@ -46,7 +46,7 @@ export class CommentsService {
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto, user_id: number): Promise<Comment> {
-    const comment = await this.commentRepository.findOne({ where: { id } });
+    const comment = await this.commentRepository.findOne({ where: { id }, relations: ['user'] });
 
     if (!comment) {
       throw new NotFoundException(`Comment doesn't exist`);
