@@ -30,7 +30,7 @@ export class CommentsService {
 
     const comment = this.commentRepository.create({ ...createCommentDto, user, post});
 
-    return this.commentRepository.save(comment);
+    return this.commentRepository.save(comment).then(saved => this.commentRepository.findOne({ where: { id: saved.id }, relations: ['user'] }) as Promise<Comment>);
   }
 
   async findAll(): Promise<Comment[]> {
@@ -38,11 +38,11 @@ export class CommentsService {
   }
 
   async findAllFromPost(post_id: number): Promise<Comment[]> {
-    return this.commentRepository.find({where: {post_id: post_id}, relations: ['user']});
+    return this.commentRepository.find({ where: { post: { id: post_id } }, relations: ['user'], order: { created_at: 'DESC' }, });
   }
 
-  findAllByUser(user_id: number): Promise<Comment[]> {
-    return this.commentRepository.find({where: {user_id: user_id}});
+  async findAllByUser(user_id: number): Promise<Comment[]> {
+    return this.commentRepository.find({ where: { user: { id: user_id } }, order: { created_at: 'DESC' }, });
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto, user_id: number): Promise<Comment> {
