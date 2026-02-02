@@ -35,6 +35,9 @@ export class User {
   @Column({ nullable: true })
   avatar?: string;
 
+  @Column({ type: 'text', default: 'USER' })
+  role: 'USER' | 'ADMIN';
+
   @CreateDateColumn()
   created_at: Date;
 
