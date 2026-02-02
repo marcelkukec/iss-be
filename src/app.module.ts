@@ -24,7 +24,7 @@ import { UserGroupsController } from './user-groups/user-groups.controller';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [Post, Comment, User, Group, UserGroup],
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: process.env.TYPEORM_SYNC === 'true' || process.env.NODE_ENV !== 'production',
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }),
     PostsModule,
