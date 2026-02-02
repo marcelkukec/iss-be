@@ -61,4 +61,10 @@ export class UserService {
     const user = await this.findById(id);
     await this.userRepository.remove(user);
   }
+
+  async setActive(userId: number, isActive: boolean) {
+    await this.userRepository.update({ id: userId }, { isActive });
+    return { ok: true };
+  }
+
 }

@@ -15,6 +15,7 @@ import { GroupsModule } from './groups/groups.module';
 import { Group } from './groups/entity/group';
 import { UserGroup } from './user-groups/entity/user-group';
 import { UserGroupsController } from './user-groups/user-groups.controller';
+import { AdminModule } from './admin/admin.module';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { UserGroupsController } from './user-groups/user-groups.controller';
     UsersModule,
     AuthModule,
     GroupsModule,
+    AdminModule
   ],
   controllers: [AppController, UserGroupsController],
   providers: [AppService],
