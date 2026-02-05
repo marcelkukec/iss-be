@@ -8,7 +8,7 @@ import { UploadsService } from './uploads.service';
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
-  @Post()
+  @Post('presign')
   presign(
     @Body() body: { filename: string; contentType: string }
   ) {
