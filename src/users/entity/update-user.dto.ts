@@ -19,10 +19,6 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  avatar?: string;
-
-  @IsOptional()
-  @IsString()
   password?: string;
 
   @IsNotEmpty()

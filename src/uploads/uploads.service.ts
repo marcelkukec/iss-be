@@ -14,18 +14,25 @@ export class UploadsService {
   });
 
   async createPresignedUpload(filename: string, contentType: string) {
-    if (!filename || !contentType) {
-      throw new BadRequestException('File name and contentType are required');
+    const allowedTypes: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+    };
+
+    const ext = allowedTypes[contentType];
+
+    if (!ext) {
+      throw new BadRequestException('Only JPEG and PNG images are allowed');
     }
 
-    if (!contentType.startsWith('image/')) {
-      throw new BadRequestException('Only image uploads are allowed');
+    const bucket = process.env.S3_BUCKET;
+    const publicBase = process.env.S3_PUBLIC_BASE_URL;
+
+    if (!bucket || !publicBase) {
+      throw new Error('S3 configuration missing');
     }
 
-    const ext = filename.split('.').pop();
-    const key = `uploads/${randomUUID()}.${ext}`;
-    const bucket = process.env.S3_BUCKET!;
-    const publicBase = process.env.S3_PUBLIC_BASE_URL!;
+    const key = `uploads/avatars/${randomUUID()}.${ext}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
@@ -34,13 +41,13 @@ export class UploadsService {
     });
 
     const uploadUrl = await getSignedUrl(this.s3, command, {
-      expiresIn: 60
+      expiresIn: 60,
     });
 
     return {
       uploadUrl,
       publicUrl: `${publicBase}/${key}`,
-      key
-    };
+      key,
+    }
   }
 }
