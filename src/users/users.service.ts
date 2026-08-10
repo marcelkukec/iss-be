@@ -18,7 +18,17 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({where: {email}})
+    console.log('Looking up email:', JSON.stringify(email));
+
+    const users = await this.userRepository.find({
+      select: ['id', 'email'],
+    });
+
+    console.log('Known emails:', users.map(u => JSON.stringify(u.email)));
+
+    return await this.userRepository.findOne({
+      where: { email },
+    });
   }
 
   async findById(id: number): Promise<User> {
@@ -57,8 +67,17 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async updateAvatar(id: number, avatar: string): Promise<User> {
+    const user = await this.findById(id);
+
+    user.avatar = avatar;
+    return this.userRepository.save(user);
+  }
+
   async delete(id: number): Promise<void> {
     const user = await this.findById(id);
+
+
     await this.userRepository.remove(user);
   }
 
