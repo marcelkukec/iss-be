@@ -15,13 +15,7 @@ export class AuthService {
   }
 
   async login(userLoginDto: UserLoginDto) {
-    console.log('Email:', JSON.stringify(userLoginDto.email));
-    console.log('Password length:', userLoginDto.password?.length);
-
-    //const email = userLoginDto.email.trim().toLowerCase();
     const user = await this.userService.findByEmail(userLoginDto.email);
-
-    console.log('User found:', !!user);
 
     if (!user) {
       throw new UnauthorizedException('Invalid login credentials');
@@ -31,8 +25,6 @@ export class AuthService {
       userLoginDto.password,
       user.password,
     );
-
-    console.log('Password matches:', passwordMatches);
 
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid login credentials');
