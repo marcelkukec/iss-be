@@ -67,8 +67,11 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async updateAvatar(id: number, avatar: string): Promise<User> {
+  async updateAvatar(id: number, avatar: string, currentPassword: string): Promise<User> {
     const user = await this.findById(id);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) throw new ForbiddenException('Current password is incorrect');
 
     user.avatar = avatar;
     return this.userRepository.save(user);
@@ -76,7 +79,6 @@ export class UserService {
 
   async delete(id: number): Promise<void> {
     const user = await this.findById(id);
-
 
     await this.userRepository.remove(user);
   }

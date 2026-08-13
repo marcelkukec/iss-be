@@ -1,7 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { S3Client, PutObjectCommand} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
+import { UserService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UploadsService {
@@ -13,7 +15,24 @@ export class UploadsService {
     }
   });
 
-  async createPresignedUpload(filename: string, contentType: string) {
+  constructor(
+    private readonly userService: UserService,
+  ) {}
+
+  async createPresignedUpload(
+    userId: number,
+    filename: string,
+    contentType: string,
+    currentPassword: string) {
+
+    const user = await this.userService.findById(userId);
+
+    const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+
+    if (!passwordMatches) {
+      throw new ForbiddenException('Invalid password');
+    }
+
     const allowedTypes: Record<string, string> = {
       'image/jpeg': 'jpg',
       'image/png': 'png',
