@@ -15,13 +15,10 @@ export class PostsController {
 
   @HttpPost()
   async create(
-    @Body() createPostDto: CreatePostDto & { group_id: number},
+    @Body() createPostDto: CreatePostDto,
     @Req() req: RequestWithUser
   ): Promise<Post> {
-    const user_id = (req.user as any).id;
-    const group_id = createPostDto.group_id;
-
-    return this.postService.create(createPostDto, user_id, group_id);
+    return this.postService.create(createPostDto, req.user.id);
   }
 
   @Public()

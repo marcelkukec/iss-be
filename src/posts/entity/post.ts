@@ -21,6 +21,9 @@ export class Post {
   @Column()
   body: string;
 
+  @Column()
+  image?: string;
+
   @CreateDateColumn()
   created_at: Date;
 

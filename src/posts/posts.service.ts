@@ -23,8 +23,9 @@ export class PostsService {
     private readonly userGroupService: UserGroupsService,
   ) {}
 
-  async create(createPostDto: CreatePostDto, user_id: number, group_id: number): Promise<Post> {
+  async create(createPostDto: CreatePostDto, user_id: number): Promise<Post> {
     const user = await this.userRepository.findOne({ where: { id: user_id } });
+    const { group_id, ...postData } = createPostDto;
     const group = await this.groupRepository.findOne({ where: { id: group_id } });
 
     if(!user || !group) {
@@ -36,7 +37,7 @@ export class PostsService {
       throw new ForbiddenException(`User isn't in this group`);
     }
 
-    const newPost = this.postRepository.create({ ...createPostDto, user, group });
+    const newPost = this.postRepository.create({ ...postData, user, group });
 
     return this.postRepository.save(newPost);
   }

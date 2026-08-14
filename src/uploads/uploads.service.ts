@@ -5,6 +5,8 @@ import { randomUUID } from 'crypto';
 import { UserService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
+export type UploadType = 'avatars' | 'posts';
+
 @Injectable()
 export class UploadsService {
   private s3 = new S3Client({
@@ -23,14 +25,21 @@ export class UploadsService {
     userId: number,
     filename: string,
     contentType: string,
-    currentPassword: string) {
+    uploadType: UploadType,
+    currentPassword?: string) {
 
-    const user = await this.userService.findById(userId);
+    if (uploadType === 'avatars') {
+      if (!currentPassword) {
+        throw new ForbiddenException("Current password is required.");
+      }
 
-    const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+      const user = await this.userService.findById(userId);
 
-    if (!passwordMatches) {
-      throw new ForbiddenException('Invalid password');
+      const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+
+      if (!passwordMatches) {
+        throw new ForbiddenException('Invalid password');
+      }
     }
 
     const allowedTypes: Record<string, string> = {
@@ -51,7 +60,7 @@ export class UploadsService {
       throw new Error('S3 configuration missing');
     }
 
-    const key = `uploads/avatars/${randomUUID()}.${ext}`;
+    const key = `uploads/${uploadType}/${randomUUID()}.${ext}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,

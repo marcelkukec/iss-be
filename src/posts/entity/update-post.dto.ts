@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class UpdatePostDto {
   @IsOptional()
@@ -11,9 +11,10 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsNumber()
-  user_id?: number;
+  group_id?: number;
 
   @IsOptional()
-  @IsNumber()
-  group_id?: number;
+  @IsString()
+  @IsUrl()
+  image?: string;
 }
