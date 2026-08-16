@@ -5,16 +5,24 @@ import { Repository } from 'typeorm';
 import { CreateGroupDto } from './entity/create-group.dto';
 import { UpdateGroupDto } from './entity/update-group.dto';
 import { User } from '../users/entity/user';
+import { UserGroupsService } from '../user-groups/user-groups.service';
 
 @Injectable()
 export class GroupsService {
   constructor(
-    @InjectRepository(Group) private readonly groupsRepository: Repository<Group>,
+    @InjectRepository(Group)
+    private readonly groupsRepository: Repository<Group>,
+    private readonly userGroupsService: UserGroupsService
   ) {}
 
-  async create(createGroupDto: CreateGroupDto): Promise<Group> {
+  async create(createGroupDto: CreateGroupDto, user_id: number): Promise<Group> {
     const group = this.groupsRepository.create({ ...createGroupDto });
-    return this.groupsRepository.save(group);
+
+    const savedGroup = await this.groupsRepository.save(group);
+
+    await this.userGroupsService.addUserToGroup(user_id, savedGroup.id);
+
+    return savedGroup;
   }
 
   async findAll(): Promise<Group[]> {

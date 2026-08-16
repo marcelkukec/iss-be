@@ -1,12 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { Optional } from '@nestjs/common';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateGroupDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @Optional()
+  @IsOptional()
   @IsString()
   desc?: string;
 }

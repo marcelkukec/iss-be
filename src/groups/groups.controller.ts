@@ -20,9 +20,13 @@ import { RequestWithUser } from '../auth/request-with-user-interface';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createGroupDto: CreateGroupDto): Promise<Group> {
-    return this.groupsService.create(createGroupDto);
+  async create(
+    @Body() createGroupDto: CreateGroupDto,
+    @Req() req: RequestWithUser,
+  ): Promise<Group> {
+    return this.groupsService.create(createGroupDto, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
