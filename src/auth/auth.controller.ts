@@ -16,4 +16,10 @@ export class AuthController {
   async register(@Body() userRegisterDto: UserRegisterDto) {
     return await this.authService.register(userRegisterDto);
   }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() body: { token: string },
+  ) {
+    return this.authService.verifyEmail(body.token);
+  }
 }

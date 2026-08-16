@@ -88,4 +88,10 @@ export class UserService {
     return { ok: true };
   }
 
+  async verifyEmail(userId: number): Promise<void> {
+    await this.userRepository.update(
+      { id: userId },
+      { verified: true },
+    );
+  }
 }

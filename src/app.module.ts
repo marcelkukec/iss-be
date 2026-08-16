@@ -18,6 +18,7 @@ import { UserGroupsController } from './user-groups/user-groups.controller';
 import { AdminModule } from './admin/admin.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { UserGroupsModule } from './user-groups/user-groups.module';
+import { AuthToken } from './auth/entity/auth-token';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { UserGroupsModule } from './user-groups/user-groups.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [Post, Comment, User, Group, UserGroup],
+      entities: [Post, Comment, User, Group, UserGroup, AuthToken],
       synchronize: process.env.TYPEORM_SYNC === 'true' || process.env.NODE_ENV !== 'production',
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }),
