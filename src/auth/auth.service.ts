@@ -8,12 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthToken } from './entity/auth-token';
 import { Repository } from 'typeorm';
 import { createHash, randomBytes } from 'node:crypto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
 
     @InjectRepository(AuthToken)
     private readonly authTokenRepository: Repository<AuthToken>
@@ -32,9 +34,10 @@ export class AuthService {
 
     await this.authTokenRepository.save(authToken);
 
+    await this.mailService.sendVerificationEmail(user.email, token);
+
     return {
-      message: 'User created. Verify email',
-      verification_token: token,
+      message: 'User created. Check your email to verify account.'
     };
   }
 
