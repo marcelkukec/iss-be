@@ -98,4 +98,65 @@ export class AuthService {
       message: 'Email verified',
     };
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      return {
+        message: 'If an account with that email exists, a password reset email has been sent.',
+      };
+    }
+
+    const token = randomBytes(32).toString('hex');
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+    const authToken = this.authTokenRepository.create({
+      token_hash: tokenHash,
+      type: 'PASSWORD_RESET',
+      expires_at: new Date(Date.now() + 60 * 60 * 1000),
+      user,
+    });
+
+    await this.authTokenRepository.save(authToken);
+
+    await this.mailService.sendPasswordResetEmail(user.email, token);
+
+    return {
+      message: 'If an account with that email exists, a password reset email has been sent.',
+    };
+  }
+
+  async resetPassword(token: string, password: string) {
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+
+    const authToken = await this.authTokenRepository.findOne({
+      where: {
+        token_hash: tokenHash,
+        type: 'PASSWORD_RESET',
+      },
+      relations: ['user']
+    });
+
+    if (!authToken) {
+      throw new UnauthorizedException('Invalid password reset token');
+    }
+
+    if (authToken.used_at) {
+      throw new UnauthorizedException('Password token has already been used.');
+    }
+
+    if (authToken.expires_at < new Date()) {
+      throw new UnauthorizedException('Token has expired.');
+    }
+
+    await this.userService.resetPassword(authToken.user.id, password);
+
+    authToken.used_at = new Date();
+
+    await this.authTokenRepository.save(authToken);
+
+    return {
+      message: 'Password reset successfully.',
+    }
+  }
 }

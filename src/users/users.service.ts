@@ -62,7 +62,6 @@ export class UserService {
 
     delete (updateUserDto as any).current_password;
 
-    // Update user
     Object.assign(user, updateUserDto);
     return this.userRepository.save(user);
   }
@@ -92,6 +91,15 @@ export class UserService {
     await this.userRepository.update(
       { id: userId },
       { verified: true },
+    );
+  }
+
+  async resetPassword(userId: number, password: string,): Promise<void> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.userRepository.update(
+      { id: userId },
+      { password: hashedPassword },
     );
   }
 }
