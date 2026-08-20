@@ -35,6 +35,10 @@ export class UploadsService {
 
       const user = await this.userService.findById(userId);
 
+      if (!user.password) {
+        throw new ForbiddenException("This account does not have a password yet.");
+      }
+
       const passwordMatches = await bcrypt.compare(currentPassword, user.password);
 
       if (!passwordMatches) {
