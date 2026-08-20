@@ -89,6 +89,10 @@ export class AuthService {
     }
 
     if (authToken.used_at) {
+      throw new UnauthorizedException('Verification token has already been used.');
+    }
+
+    if (authToken.expires_at < new Date()) {
       throw new UnauthorizedException('Token has expired.');
     }
 
@@ -178,7 +182,7 @@ export class AuthService {
     const payload = ticket.getPayload();
 
     if (!payload) {
-      throw new UnauthorizedException('Invalid google token');
+      throw new UnauthorizedException('Invalid Google token');
     }
 
     const {
@@ -186,11 +190,13 @@ export class AuthService {
       email,
       email_verified,
       given_name,
-      family_name
+      family_name,
     } = payload;
 
     if (!email || !email_verified) {
-      throw new UnauthorizedException('Google email is not verified');
+      throw new UnauthorizedException(
+        'Google email is not verified',
+      );
     }
 
     let user = await this.userService.findByGoogleId(googleId);
@@ -199,9 +205,33 @@ export class AuthService {
       user = await this.userService.findByEmail(email);
 
       if (user) {
-        user = await this.userService.linkGoogleAccount(user.id, googleId);
+        user = await this.userService.linkGoogleAccount(
+          user.id,
+          googleId,
+        );
       } else {
-        user = await this.userService.createGoogleUser({ email, google_id: googleId, first_name: given_name || '', last_name: family_name || '' });
+        const signupToken = this.jwtService.sign(
+          {
+            purpose: 'GOOGLE_SIGNUP',
+            google_id: googleId,
+            email,
+            first_name: given_name || '',
+            last_name: family_name || '',
+          },
+          {
+            expiresIn: '10m',
+          },
+        );
+
+        return {
+          requires_registration: true,
+          signup_token: signupToken,
+          user: {
+            email,
+            first_name: given_name || '',
+            last_name: family_name || '',
+          },
+        };
       }
     }
 
@@ -211,7 +241,7 @@ export class AuthService {
     };
 
     return {
-      accessToken: this.jwtService.sign(jwtPayload),
+      access_token: this.jwtService.sign(jwtPayload),
     };
   }
 }
