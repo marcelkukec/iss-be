@@ -109,42 +109,4 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
-
-  async createGoogleUser(data: {
-    email: string;
-    google_id: string;
-    first_name: string;
-    last_name: string;
-  }): Promise<User> {
-    const username = await this.generateUsernameFromGoogle(data.first_name, data.last_name);
-
-    const newUser = this.userRepository.create({
-      email: data.email,
-      google_id: data.google_id,
-      username,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      password: null,
-      verified: true,
-    });
-
-    return this.userRepository.save(newUser);
-  }
-
-  async generateUsernameFromGoogle(first_name: string, last_name: string): Promise<string> {
-    const base = `${last_name.charAt(0)}${first_name}`.toLowerCase();
-    let suffix = 1;
-    let username = base;
-
-    while (
-      await this.userRepository.findOne({
-        where: { username },
-      })
-      ) {
-      username = `${base}${suffix}`;
-      suffix++;
-    }
-
-    return username;
-  }
 }
