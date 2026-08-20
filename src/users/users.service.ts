@@ -49,9 +49,6 @@ export class UserService {
       throw new ForbiddenException('Current password is required');
     }
 
-    if (!user.password) {
-      throw new ForbiddenException('This account does not have a password yet');
-    }
     const isMatch = await bcrypt.compare(updateUserDto.current_password, user.password);
     if (!isMatch) {
       throw new ForbiddenException('Current password is incorrect');
