@@ -29,8 +29,8 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password: string | null;
 
   @Column({ nullable: true })
   avatar?: string;
@@ -43,6 +43,9 @@ export class User {
 
   @Column({ default: false })
   verified: boolean;
+
+  @Column({ nullable: true, unique: true })
+  google_id: string | null;
 
   @CreateDateColumn()
   created_at: Date;
@@ -61,6 +64,8 @@ export class User {
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
-    this.password = await bcrypt.hash(this.password, 10);
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
   }
 }

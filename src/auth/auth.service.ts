@@ -9,6 +9,7 @@ import { AuthToken } from './entity/auth-token';
 import { Repository } from 'typeorm';
 import { createHash, randomBytes } from 'node:crypto';
 import { MailService } from '../mail/mail.service';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,8 @@ export class AuthService {
     @InjectRepository(AuthToken)
     private readonly authTokenRepository: Repository<AuthToken>
   ) {}
+
+  private readonly googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   async register(userRegisterDto: UserRegisterDto) {
     const user = await this.userService.create(userRegisterDto);
@@ -44,7 +47,7 @@ export class AuthService {
   async login(userLoginDto: UserLoginDto) {
     const user = await this.userService.findByEmail(userLoginDto.email);
 
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid login credentials');
     }
 
@@ -158,5 +161,57 @@ export class AuthService {
     return {
       message: 'Password reset successfully.',
     }
+  }
+
+  async googleLogin(credential: string) {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      throw new Error('Client id is missing.');
+    }
+
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken: credential,
+      audience: clientId,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      throw new UnauthorizedException('Invalid google token');
+    }
+
+    const {
+      sub: googleId,
+      email,
+      email_verified,
+      given_name,
+      family_name
+    } = payload;
+
+    if (!email || !email_verified) {
+      throw new UnauthorizedException('Google email is not verified');
+    }
+
+    let user = await this.userService.findByGoogleId(googleId);
+
+    if (!user) {
+      user = await this.userService.findByEmail(email);
+
+      if (user) {
+        user = await this.userService.linkGoogleAccount(user.id, googleId);
+      } else {
+        user = await this.userService.createGoogleUser({ email, google_id: googleId, first_name: given_name || '', last_name: family_name || '' });
+      }
+    }
+
+    const jwtPayload = {
+      email: user.email,
+      sub: user.id,
+    };
+
+    return {
+      accessToken: this.jwtService.sign(jwtPayload),
+    };
   }
 }

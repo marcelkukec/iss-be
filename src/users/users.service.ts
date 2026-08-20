@@ -49,8 +49,13 @@ export class UserService {
       throw new ForbiddenException('Current password is required');
     }
 
+    if (!user.password) {
+      throw new ForbiddenException('This account does not have a password yet');
+    }
     const isMatch = await bcrypt.compare(updateUserDto.current_password, user.password);
-    if (!isMatch) throw new ForbiddenException('Current password is incorrect');
+    if (!isMatch) {
+      throw new ForbiddenException('Current password is incorrect');
+    }
 
     if (updateUserDto.password?.trim() === '') {
       delete updateUserDto.password;
@@ -63,16 +68,6 @@ export class UserService {
     delete (updateUserDto as any).current_password;
 
     Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
-  }
-
-  async updateAvatar(id: number, avatar: string, currentPassword: string): Promise<User> {
-    const user = await this.findById(id);
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) throw new ForbiddenException('Current password is incorrect');
-
-    user.avatar = avatar;
     return this.userRepository.save(user);
   }
 
@@ -101,5 +96,58 @@ export class UserService {
       { id: userId },
       { password: hashedPassword },
     );
+  }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { google_id: googleId },
+    });
+  }
+
+  async linkGoogleAccount(userId: number, googleId: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.google_id = googleId;
+    user.verified = true;
+
+    return this.userRepository.save(user);
+  }
+
+  async createGoogleUser(data: {
+    email: string;
+    google_id: string;
+    first_name: string;
+    last_name: string;
+  }): Promise<User> {
+    const username = await this.generateUsernameFromGoogle(data.first_name, data.last_name);
+
+    const newUser = this.userRepository.create({
+      email: data.email,
+      google_id: data.google_id,
+      username,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      password: null,
+      verified: true,
+    });
+
+    return this.userRepository.save(newUser);
+  }
+
+  async generateUsernameFromGoogle(first_name: string, last_name: string): Promise<string> {
+    const base = `${last_name.charAt(0)}${first_name}`.toLowerCase();
+    let suffix = 1;
+    let username = base;
+
+    while (
+      await this.userRepository.findOne({
+        where: { username },
+      })
+      ) {
+      username = `${base}${suffix}`;
+      suffix++;
+    }
+
+    return username;
   }
 }

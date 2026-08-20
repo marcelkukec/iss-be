@@ -34,4 +34,9 @@ export class AuthController {
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.password);
   }
+
+  @Post('google')
+  async googleLogin(@Body() body: { credential: string }) {
+    return this.authService.googleLogin(body.credential);
+  }
 }
