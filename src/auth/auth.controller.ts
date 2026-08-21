@@ -4,6 +4,7 @@ import { UserLoginDto } from './user-login.dto';
 import { UserRegisterDto } from './user-register.dto';
 import { ForgotPasswordDto } from './forgot-password.dto';
 import { ResetPasswordDto } from './reset-password.dto';
+import { GoogleRegisterDto } from './google-register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,5 +39,10 @@ export class AuthController {
   @Post('google')
   async googleLogin(@Body() body: { credential: string }) {
     return this.authService.googleLogin(body.credential);
+  }
+
+  @Post('google/register')
+  async googleRegister(@Body() googleRegisterDto: GoogleRegisterDto) {
+    return this.authService.googleRegister(googleRegisterDto.signup_token, googleRegisterDto.username, googleRegisterDto.first_name, googleRegisterDto.last_name, googleRegisterDto.password);
   }
 }

@@ -244,4 +244,75 @@ export class AuthService {
       access_token: this.jwtService.sign(jwtPayload),
     };
   }
+
+  async googleRegister(
+    signupToken: string,
+    username: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+  ) {
+    let payload: any;
+
+    try {
+      payload = this.jwtService.verify(signupToken);
+    } catch {
+      throw new UnauthorizedException(
+        'Google signup token is invalid or expired',
+      );
+    }
+
+    if (payload.purpose !== 'GOOGLE_SIGNUP') {
+      throw new UnauthorizedException(
+        'Invalid Google signup token',
+      );
+    }
+
+    const email = payload.email;
+    const googleId = payload.google_id;
+
+    if (!email || !googleId) {
+      throw new UnauthorizedException(
+        'Invalid Google signup data',
+      );
+    }
+
+    // Prevent duplicate completion attempts
+    const existingGoogleUser =
+      await this.userService.findByGoogleId(googleId);
+
+    if (existingGoogleUser) {
+      throw new UnauthorizedException(
+        'Google account is already registered',
+      );
+    }
+
+    const existingEmail =
+      await this.userService.findByEmail(email);
+
+    if (existingEmail) {
+      throw new UnauthorizedException(
+        'An account with this email already exists',
+      );
+    }
+
+    const user =
+      await this.userService.createGoogleRegisteredUser({
+        email,
+        google_id: googleId,
+        username,
+        first_name: firstName,
+        last_name: lastName,
+        password,
+      });
+
+    const jwtPayload = {
+      email: user.email,
+      sub: user.id,
+    };
+
+    return {
+      access_token: this.jwtService.sign(jwtPayload),
+    };
+  }
 }

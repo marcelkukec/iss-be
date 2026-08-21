@@ -109,4 +109,25 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
+
+  async createGoogleRegisteredUser(data: {
+    email: string;
+    google_id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+  }): Promise<User> {
+    const newUser = this.userRepository.create({
+      email: data.email,
+      google_id: data.google_id,
+      username: data.username,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      password: data.password,
+      verified: true,
+    });
+
+    return this.userRepository.save(newUser);
+  }
 }
